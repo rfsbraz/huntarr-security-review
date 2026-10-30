@@ -4,13 +4,41 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  HUNTARR_ARCHIVE: MGHazz/huntarr.io-archive
+  HUNTARR_SHA: fa475ab683d1a1e1bf5d3b72d0ae1468a3a6c19e
+  HUNTARR_VERSION: 9.4.2
+
 jobs:
   prove:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check out the reviewed Huntarr source
+        id: archive
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.HUNTARR_ARCHIVE }}
+          ref: ${{ env.HUNTARR_SHA }}
+          path: huntarr-src
+          persist-credentials: false
+
+      - name: Build the Huntarr lab image
+        env:
+          ARCHIVE_OUTCOME: ${{ steps.archive.outcome }}
+        run: |
+          unreachable() {
+            echo "::error::The archived Huntarr $HUNTARR_VERSION source ($HUNTARR_ARCHIVE@$HUNTARR_SHA) is unreachable or no longer builds: $1. The committed results/ stand as the record of the review."
+            exit 1
+          }
+          [ "$ARCHIVE_OUTCOME" = "success" ] || unreachable "checkout failed"
+          version="$(tr -d '[:space:]' < huntarr-src/version.txt 2>/dev/null)"
+          [ "$version" = "$HUNTARR_VERSION" ] || unreachable "version.txt reads '$version', expected $HUNTARR_VERSION"
+          docker build -t "huntarr-lab:$HUNTARR_VERSION" huntarr-src || unreachable "docker build failed"
 
       - name: Start Huntarr
         run: docker compose up -d huntarr
