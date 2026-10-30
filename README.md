@@ -2,6 +2,8 @@
 
 Automated proof that Huntarr v9.4.2 has critical authentication bypass vulnerabilities. Every API endpoint tested below is callable by an unauthenticated attacker with zero credentials.
 
+Full write-up: https://rodrigobraz.com/writing/huntarr-review/
+
 **If you run Huntarr and it's reachable on your network, anyone can read your passwords and rewrite your config right now. No login required. This includes not just Huntarr's own credentials but API keys for every *arr application it manages - Sonarr, Radarr, Prowlarr, Lidarr, and more. If your instance is internet-facing (and Huntarr incorporates features like Requestarr that are designed for external access), a single unauthenticated curl command gives an attacker direct API access to your entire media stack.**
 
 ## The short version
