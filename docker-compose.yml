@@ -1,6 +1,7 @@
 services:
   huntarr:
-    image: ghcr.io/plexguide/huntarr:latest
+    image: huntarr-lab:9.4.2
+    pull_policy: never
     container_name: huntarr-security-repro
     ports:
       - "9705:9705"

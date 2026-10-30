@@ -29,7 +29,7 @@ No login page. No session cookie. No API key. Nothing. The endpoint is wide open
 
 ## Findings
 
-Tested against `ghcr.io/plexguide/huntarr:latest` (v9.4.2, commit `fa475ab6`).
+Tested against `ghcr.io/plexguide/huntarr:latest` (v9.4.2, commit `fa475ab6`). That image can no longer be pulled, so the lab now builds v9.4.2 from the same commit in the public archive [MGHazz/huntarr.io-archive](https://github.com/MGHazz/huntarr.io-archive/tree/fa475ab683d1a1e1bf5d3b72d0ae1468a3a6c19e). No Huntarr source is copied into this repo.
 
 | ID | Vulnerability | Severity | Result |
 |----|--------------|----------|--------|
@@ -75,9 +75,12 @@ These are not subtle bugs. They are missing fundamentals - from someone who says
 
 ## Run It Yourself
 
-Start Huntarr and run the proof script:
+Build the v9.4.2 lab image from the archived source, then start Huntarr and run the proof script:
 
 ```bash
+git clone https://github.com/MGHazz/huntarr.io-archive.git huntarr-src
+git -C huntarr-src checkout fa475ab683d1a1e1bf5d3b72d0ae1468a3a6c19e
+docker build -t huntarr-lab:9.4.2 huntarr-src
 docker compose up -d huntarr
 python3 scripts/prove_vulns.py
 ```
@@ -94,7 +97,7 @@ Requires: Docker, Python 3.8+ (stdlib only, no pip installs).
 
 ## CI
 
-This repo runs the proof automatically via GitHub Actions on every push. Check the [Actions tab](../../actions) for the latest run and download the `proof-results` artifact.
+This repo runs the proof automatically via GitHub Actions on every push. The workflow builds the lab image from the archive at the pinned commit first. If the archive is ever unreachable, the run fails with a message saying so, and the committed `results/` stand as the record. Check the [Actions tab](../../actions) for the latest run and download the `proof-results` artifact.
 
 ## What happens next
 
